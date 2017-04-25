@@ -1,0 +1,23 @@
+//EDSON YUDI TOMA - 9791305
+#include "busca.h"
+#include "matriz.h"
+#include "fila.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+int buscaP(MATRIX *matriz, int inicio, int fim) {
+   if (matriz != NULL) {
+      if (inicio != fim) {
+         char *cor = (char *)malloc(sizeof(char)*matriz->n);
+         int *anterior = (int *)malloc(sizeof(int)*matriz->n);
+         int *caminho = NULL;
+
+         for (int i = 0; i < matriz->n; i++) {
+            cor[i] = 'b';
+            anterior[i] = -1;
+         }
+         
+      }
+   }
+   return 0;
+}

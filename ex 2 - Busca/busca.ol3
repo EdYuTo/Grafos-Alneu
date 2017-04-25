@@ -1,0 +1,122 @@
+//EDSON YUDI TOMA - 9791305
+#include "busca.h"
+#include "matriz.h"
+#include "fila.h"
+#include "pilha.h"
+#include <stdlib.h>
+#include <stdio.h>
+
+void visit(int u, MATRIX *matriz, int fim, int *time, char *cor, int *caminho, int *distancia, int *flag) {
+   if (*flag) return;
+   int i;
+   cor[u] = 'c';
+   *time = (*time) + 1;
+   distancia[u] = *time;
+   
+   for (i = 0; i < matriz->n; i++) {
+      if (matriz->matriz[u][i] > -1) //vertice eh adjacente
+         if (cor[i] == 'b') {
+            caminho[i] = u;
+            visit(i, matriz, fim, time, cor, caminho, distancia, flag);
+         }
+      if (i == fim) break;
+   }
+   if (i == fim) {
+      int j = 0, *vec = (int *)malloc(sizeof(int));
+      vec[j++] = i;//fim
+      while (distancia[i]) {
+         vec = (int *)realloc(vec, sizeof(int)*(j+1));
+         vec[j++] = caminho[i];
+         i = caminho[i];//vai voltando ate chegar no inicio
+      }
+      while (j > 0)//como o vetor foi preenchido como caminho invertido, imprime-se invertido
+         printf("%d ", vec[--j]);
+      free(vec);
+      *flag = 1;
+   }
+   printf("\n");
+   cor[u] = 'b';
+   return;
+}
+
+int buscaP(MATRIX *matriz, int inicio, int fim) {
+   if (matriz != NULL) {
+      if (inicio == fim)
+         printf("%d\n", inicio);
+      else {
+         char *cor = (char *)malloc(sizeof(char)*matriz->n);//= nvertices
+         int *caminho = (int *)malloc(sizeof(int)*matriz->n), flag = 0;//= nvertices
+         int *distancia = (int *)malloc(sizeof(int)*matriz->n), time = 0, i;//= nvertices
+         for (i = 0; i < matriz->n; i++) {
+            cor[i] = 'b';
+            caminho[i] = -1;
+            distancia[i] = 0;
+         }
+         for (i = inicio;i < matriz->n && !flag; i++) {
+for (int j = 0; j < matriz->n; j++) distancia[j] = 0;
+            time = 0;
+            if (cor[i] == 'b')
+               visit(i, matriz, fim, &time, cor, caminho, distancia, &flag);
+         }
+      }    
+   }
+   return 0;
+}
+
+int buscaL(MATRIX *matriz, int inicio, int fim) {
+   if (matriz != NULL) {
+      if (inicio == fim)
+         printf("%d\n", inicio);
+      else {
+         char *cor = (char *)malloc(sizeof(char)*matriz->n);//= nvertices
+         int *caminho = (int *)malloc(sizeof(int)*matriz->n);//= nvertices
+         int *distancia = (int *)malloc(sizeof(int)*matriz->n), aux, i;//= nvertices
+
+         for (i = 0; i < matriz->n; i++) {
+            cor[i] = 'b';//branca
+            distancia[i] = 0;
+            caminho[i] = -1;
+         } 
+         cor[inicio] = 'c';//cinza
+         distancia[inicio] = 0;
+
+         FILA *fila = criarFila();
+         add(fila, inicio);
+         while (!vaziaFila(fila)) {
+            aux = rem(fila);
+            for (i = 0; i < matriz->n; i++)
+               if (matriz->matriz[aux][i] > -1) {//vertice eh adjacente
+                  if (cor[i] == 'b') {
+                     cor[i] = 'c';
+                     distancia[i] = distancia[aux] + 1;
+                     caminho[i] = aux;
+                     add(fila, i);
+                     if (i == fim) break;//encontrou o desejado
+                  }                  
+               }
+            if (i == fim) break;//encontrou o desejado
+            cor[aux] = 'p';//preta
+         }
+         if (vaziaFila(fila))
+            printf("\n");//nao encontrou e, portanto, apenas imprime um pulo de linha
+         else {//vec eh um auxiliar para imprimir ao contrario
+            int j = 0, *vec = (int *)malloc(sizeof(int));
+            vec[j++] = i;//fim
+            while (distancia[i]) {
+               vec = (int *)realloc(vec, sizeof(int)*(j+1));
+               vec[j++] = caminho[i];
+               i = caminho[i];//vai voltando ate chegar no inicio
+            }
+            while (j > 0)//como o vetor foi preenchido como caminho invertido, imprime-se invertido
+               printf("%d ", vec[--j]);
+            printf("\n");
+            free(vec);
+         }
+         apagarFila(fila);
+         free(cor);
+         free(distancia);
+         free(caminho);
+      }
+   }
+   return 0;
+}
